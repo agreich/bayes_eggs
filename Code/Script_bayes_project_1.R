@@ -80,3 +80,9 @@ coho.egg.graph <- ggplot(coho.clean) + aes(x=Length..mm., y=Diameter..mm., color
     theme(legend.position = c(0.03, 0.94))+
     coord_cartesian(ylim=c(5,8.5)) +
     scale_y_continuous(breaks=c(5,6,7,8), expand=c(0,0))
+
+
+#11/22/22
+###Nice. LEt's make a stan model
+names(coho_eggs)
+range(coho_eggs$Length..mm.)
