@@ -9,15 +9,17 @@
 //    https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started
 //
 
+
+//below is wrong. need to adjust data to say my data specific things
 // The input data is a vector 'y' of length 'N'.
 data {
   int<lower=1> N;                  //should lower= 0 or 1??
-real Diameter..mm.[N]; //Diameter..mm. is the response variable
-real<lower=477, upper=631> so[N]; //put fish length as predictor? Are lower and upper the min and max?
+real Egg.diam[N]; //Diameter..mm. is the response variable
+real<lower=477, upper=631> Length[N]; //put fish length as predictor? Are lower and upper the min and max?
 int<lower=1> J; // fish ID
 int<lower=1> K; // fish origin, wild or hatch (this should be a factor)
-int<lower=1, upper=J> subj[N]; //I guess this belongs here too?
-int<lower=1, upper=K> item[N]; // Make sure I'm doing this right
+int<lower=1, upper=J> Fish_ID_Index[N]; //I guess this belongs here too?
+int<lower=1, upper=K> Wild_or_Hatch_ID[N]; // Make sure I'm doing this right
 //find paper with your written notes from office hours (probs at desk at work)
 }
 
@@ -45,8 +47,8 @@ w ~ normal(0, sigma_w); // wild or hatch random effects (DO WE WANT RANDOM EFFEC
 //I think w (wild or hatch) should just be a factor? HELP!
 // likelihood
 for (i in 1:N){
-mu = beta[1] + u[Fish_ID_Index[i]] + w[Wild_or_Hatch_ID[i]] + beta[2] * Length..mm.[i];
-    Diameter..mm.[i] ~ normal(mu, sigma_e);
+mu = beta[1] + u[Fish_ID_Index[i]] + w[Wild_or_Hatch_ID[i]] + beta[2] * Length[i];
+    Egg_diam[i] ~ normal(mu, sigma_e);
   }
 }
 

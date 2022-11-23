@@ -159,9 +159,17 @@ coho_eggs_4 <- coho_eggs_3 %>%
 #coho_eggs_3 <- coho_eggs_3 %>% dplyr::select(Wild_or_Hatch_ID,)
 
 
-#ok set up stan stuff
+#ok set up stan dat stuff
+stanDat <- list(Fish_ID_Index = as.integer(coho_eggs_4$Fish_ID_Index), #change to be egg spec
+                Wild_or_Hatch_ID = as.integer(coho_eggs_4$Wild_or_Hatch_ID),
+                Egg_diam = coho_eggs_4$Diameter..mm.,
+                Length = coho_eggs_4$Length..mm.,
+                N = nrow(coho_eggs_4),
+                J = nlevels(as.factor(coho_eggs_4$Fish_ID_Index)),
+                K = nlevels(as.factor(coho_eggs_4$item)))
+
 
 #now I can run rstan with the coho_eggs_3 dataset
-stantest_2 <- stan(file="Stan_mod_eggs_figureout.stan", data = coho_eggs_4,
+stantest_2 <- stan(file="Stan_mod_eggs_figureout.stan", data = stanDat,
                    iter = 2000, chains = 4)
 
