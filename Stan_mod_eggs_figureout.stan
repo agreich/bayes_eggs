@@ -45,7 +45,7 @@ w ~ normal(0, sigma_w); // wild or hatch random effects (DO WE WANT RANDOM EFFEC
 //I think w (wild or hatch) should just be a factor? HELP!
 // likelihood
 for (i in 1:N){
-mu = beta[1] + u[Fish.ID[i]] + w[Wild.or.Hatch[i]] + beta[2] * Length..mm.[i];
+mu = beta[1] + u[Fish_ID_Index[i]] + w[Wild_or_Hatch_ID[i]] + beta[2] * Length..mm.[i];
     Diameter..mm.[i] ~ normal(mu, sigma_e);
   }
 }

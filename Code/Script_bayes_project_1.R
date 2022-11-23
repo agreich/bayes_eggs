@@ -86,3 +86,82 @@ coho.egg.graph <- ggplot(coho.clean) + aes(x=Length..mm., y=Diameter..mm., color
 ###Nice. LEt's make a stan model
 names(coho_eggs)
 range(coho_eggs$Length..mm.)
+
+#ok I made one, but may have included the fish origin as a random intercept (in addition to fish ID)
+##and I think that is wrong, only fish ID should be a random intercept?
+
+#anyway, let's try running this model.
+##referencing "Mixed_model_stan" aka Sorensen et al. 2016 for example LMM rstan code
+###listing 5
+library(rstan)
+# 1. Compile and fit model
+stantest_1 <- stan(file="Stan_mod_eggs_figureout.stan", data = coho_eggs,
+                          iter = 2000, chains = 4)
+# posterior probability of beta 1 being less than 0:
+beta1 <- unlist(extract(ranIntSlpNoCorFit, pars = "beta[2]"))
+print(quantile(beta1, probs = c(0.025, 0.5, 0.975)))
+mean(beta1 < 0)
+
+#surprise surprise, we have an error
+#I think it's because  "Fish.ID" is composed of characters, not numbers
+##Fish origin is also composed of characters, not numbers. How to tell stan to count each character as a number?
+##OR do I have to data wrangle?
+
+
+###Well, I don;t know how to do this the stan way
+##but I do know how to data wrangle.
+##It's going to be a lot worse to re-do the indexing for the Fish.ID than for Wild.or.Hatch
+###TO DO: re-do indexing for Wild.or.Hatch and Fish.ID to be numbers
+
+
+#10/23/22
+##Margaret has confirmed, I need to change my covariates into indexes
+##easy for wild/hatch
+##not so easy for fish ID
+##I'll look into how I originally created that dataset
+
+###Fish ID data wrangling
+Fish_ID_Index <- c(1:55)
+length(unique(coho_eggs$Fish.ID))
+#Fish_ID_order <- order(unique(coho_eggs$Fish.ID))
+Fish.ID <- as.character(unique(coho_eggs$Fish.ID))
+#data.frame(Fish_ID, Fish_ID_order)
+#can take the time to order, but I dont think I need to for my purposes today
+##but would need to do this in excel, I think
+#anyway, let's give each fish a number
+#wild/hatch as 1 or 2. 1 if wild, 2 if hatch.
+
+df_fishID <- data.frame(Fish.ID, Fish_ID_Index)
+remove(Fish.ID)
+#df_fishID_WH <- df_fishID %>% 
+ # mutate(
+  #  ifelse(Wild.or.Hatch == "wild", Wild_or_Hatch_ID = 1, Wild_or_Hatch_ID = 2))
+##each fish Id had a number
+library(dplyr)
+coho_eggs_2 <- left_join(coho_eggs, df_fishID, by=c("Fish.ID"="Fish.ID"))
+names(coho_eggs_2)
+
+#add wild/hatch
+coho_eggs_3 <- coho_eggs_2 %>%
+  mutate(
+  Wild_or_Hatch_ID = ifelse(Wild.or.Hatch == "wild", 1, 2)
+    )
+names(coho_eggs_3)
+head(coho_eggs_3)
+
+coho_eggs_4 <- coho_eggs_3 %>%
+  mutate(
+  Wild_or_Hatch_ID = as.integer(Wild_or_Hatch_ID)
+  )
+
+#coho_eggs_4
+
+#coho_eggs_3 <- coho_eggs_3 %>% dplyr::select(Wild_or_Hatch_ID,)
+
+
+#ok set up stan stuff
+
+#now I can run rstan with the coho_eggs_3 dataset
+stantest_2 <- stan(file="Stan_mod_eggs_figureout.stan", data = coho_eggs_4,
+                   iter = 2000, chains = 4)
+
