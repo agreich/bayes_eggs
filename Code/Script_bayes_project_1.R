@@ -175,8 +175,50 @@ stanDat <- list(Fish_ID_Index = as.integer(coho_eggs_4$Fish_ID_Index), #change t
 #now I can run rstan with the coho_eggs_3 dataset
 stantest_2 <- stan(file="Stan_mod_eggs_figureout.stan", data = stanDat,
                    iter = 2000, chains = 4)
+#saveRDS(stantest_2, "stantest_2.rds")
 
-#plot(stantest_2)
+#successfully ran stan mod! Now let's look at what happened:
+plot(stantest_2)
+print(stantest_2, pars = c("beta", "sigma_e", "sigma_u", "sigma_w"),
+      probs = c(0.025, 0.5, 0.975)) #werid...
+#maybe lppk at how marg does results??
+print(stantest_2, pars = c("beta", "u", "w", "sigma_e", "sigma_u", "sigma_w"),
+      probs = c(0.025, 0.5, 0.975))
+#how to interpret though?
+summary(stantest_2)
+
+#more plots
+stan_trace(stantest_2, pars=c("beta", "sigma_e", "sigma_u", "sigma_w"))
+##beta 0 is super wandering. Do for more iterations? Alow for a different prior??
+##beta 1 is pretty wandery too. 
+
+stan_hist(stantest_2)
+
+
+#I think try running stantest 3 longer. try 10,000 iterations. Yes, it will take forever.
+##oh. Any mayve center the eggs before running. And center the length too??
+coho_eggs_5 <- coho_eggs_4 %>% 
+  mutate(c_egg_diam = Diameter..mm. - mean(Diameter..mm.)) %>%
+  mutate(c_length = Length..mm. - mean(Length..mm.))
+names(coho_eggs_5)
+
+
+stanDat_3 <- list(Fish_ID_Index = as.integer(coho_eggs_5$Fish_ID_Index), #change to be egg spec
+                Wild_or_Hatch_ID = as.integer(coho_eggs_5$Wild_or_Hatch_ID),
+                Egg_diam = coho_eggs_5$c_egg_diam,
+                Length = coho_eggs_5$c_length,
+                N = nrow(coho_eggs_5),
+                J = nlevels(as.factor(coho_eggs_5$Fish_ID_Index)),
+                K = nlevels(as.factor(coho_eggs_5$Wild_or_Hatch_ID)))
+stantest_3 <- stan(file="Stan_mod_eggs_figureout.stan", data = stanDat_3,
+                   iter = 2000, chains = 4)
+#gives weird errors
+#saveRDS(stantest_3, "stantest_3.rds")
+plot(stantest_3)
+stan_trace(stantest_3)
+stan_hist(stantest_3)
+
+
 
 #exp 11/29/22
 class(coho_eggs_4)

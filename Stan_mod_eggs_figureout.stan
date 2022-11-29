@@ -15,7 +15,7 @@
 data {
   int<lower=1> N;                  //should lower= 0 or 1??
 real Egg_diam[N]; //Diameter..mm. is the response variable
-real<lower=477, upper=631> Length[N]; //put fish length as predictor? Are lower and upper the min and max?
+real Length[N]; //<lower=477, upper=631>//put fish length as predictor? Are lower and upper the min and max?
 int<lower=1> J; // fish ID
 int<lower=1> K; // fish origin, wild or hatch (this should be a factor)
 int<lower=1, upper=J> Fish_ID_Index[N]; //I guess this belongs here too?
@@ -30,10 +30,10 @@ parameters {
   vector[2] beta; //fixed intercept and slope. // why is 2 here??. Oh, becasuse there are 2 betas?
   vector[J] u;  //ID intercepts. What is u?
   vector[K] w; //Wild or hatch intercepts. What is w?
-  real<lower=0> sigma_e; // error sd
+  real<lower=0> sigma_e; // error sd.
   real<lower=0> sigma_u; // subj sd
   real<lower=0> sigma_w; // item sd
-  //so I think I use different errors for all of these. Check with Margaret.
+  //SOOO WHERE ARE THESE SIGMA'S FROM?
 }
 
 // The model to be estimated. We model the output
