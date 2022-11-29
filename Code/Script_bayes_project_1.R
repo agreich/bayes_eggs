@@ -94,13 +94,16 @@ range(coho_eggs$Length..mm.)
 ##referencing "Mixed_model_stan" aka Sorensen et al. 2016 for example LMM rstan code
 ###listing 5
 library(rstan)
+options(mc.cores = parallel::detectCores())
+rstan_options(auto_write = TRUE)
+
 # 1. Compile and fit model
-stantest_1 <- stan(file="Stan_mod_eggs_figureout.stan", data = coho_eggs,
-                          iter = 2000, chains = 4)
+#stantest_1 <- stan(file="Stan_mod_eggs_figureout_2.stan", data = coho_eggs,
+        #                  iter = 2000, chains = 4)
 # posterior probability of beta 1 being less than 0:
-beta1 <- unlist(extract(ranIntSlpNoCorFit, pars = "beta[2]"))
-print(quantile(beta1, probs = c(0.025, 0.5, 0.975)))
-mean(beta1 < 0)
+#beta1 <- unlist(extract(ranIntSlpNoCorFit, pars = "beta[2]"))
+#print(quantile(beta1, probs = c(0.025, 0.5, 0.975)))
+#mean(beta1 < 0)
 
 #surprise surprise, we have an error
 #I think it's because  "Fish.ID" is composed of characters, not numbers
@@ -166,10 +169,15 @@ stanDat <- list(Fish_ID_Index = as.integer(coho_eggs_4$Fish_ID_Index), #change t
                 Length = coho_eggs_4$Length..mm.,
                 N = nrow(coho_eggs_4),
                 J = nlevels(as.factor(coho_eggs_4$Fish_ID_Index)),
-                K = nlevels(as.factor(coho_eggs_4$item)))
+                K = nlevels(as.factor(coho_eggs_4$Wild_or_Hatch_ID)))
 
 
 #now I can run rstan with the coho_eggs_3 dataset
 stantest_2 <- stan(file="Stan_mod_eggs_figureout.stan", data = stanDat,
                    iter = 2000, chains = 4)
 
+#plot(stantest_2)
+
+#exp 11/29/22
+class(coho_eggs_4)
+nlevels(as.factor(coho_eggs_4$Wild_or_Hatch_ID))

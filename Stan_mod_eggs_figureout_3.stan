@@ -13,13 +13,13 @@
 //below is wrong. need to adjust data to say my data specific things
 // The input data is a vector 'y' of length 'N'.
 data {
-  int<lower=1> N;                  //should lower= 0 or 1??
+  int N;                  //should lower= 0 or 1??
 real Egg_diam[N]; //Diameter..mm. is the response variable
-real<lower=477, upper=631> Length[N]; //put fish length as predictor? Are lower and upper the min and max?
-int<lower=1> J; // fish ID
-int<lower=1> K; // fish origin, wild or hatch (this should be a factor)
-int<lower=1, upper=J> Fish_ID_Index[N]; //I guess this belongs here too?
-int<lower=1, upper=K> Wild_or_Hatch_ID[N]; // Make sure I'm doing this right
+real Length[N]; //put fish length as predictor? Are lower and upper the min and max?
+int J; // fish ID
+int K; // fish origin, wild or hatch (this should be a factor)
+int Fish_ID_Index[N]; //I guess this belongs here too?
+int Wild_or_Hatch_ID[N]; // Make sure I'm doing this right
 //find paper with your written notes from office hours (probs at desk at work)
 }
 
@@ -40,15 +40,22 @@ parameters {
 // 'y' to be normally distributed with mean 'mu'
 // and standard deviation 'sigma'.
 model {
-  real mu;
+  vector[N] mu;
+  //real mu; //might need vector?
 //priors
-u ~ normal(0, sigma_u); //ID random effects
-w ~ normal(0, sigma_w); // wild or hatch random effects (DO WE WANT RANDOM EFFECTS HERE? I'M NOT SURE IF WE DO.)
+for (i in 1:J){
+  u[i] ~ normal(0, sigma_u)
+}
+//u ~ normal(0, sigma_u); //ID random effects
+for (i in 1:K){
+  w[i] ~ normal(0, sigma_w)
+}
+//w ~ normal(0, sigma_w); // wild or hatch random effects (DO WE WANT RANDOM EFFECTS HERE? I'M NOT SURE IF WE DO.)
 //I think w (wild or hatch) should just be a factor? HELP!
 // likelihood
 for (i in 1:N){
-mu = beta[1] + u[Fish_ID_Index[i]] + w[Wild_or_Hatch_ID[i]] + beta[2] * Length[i];
-    Egg_diam[i] ~ normal(mu, sigma_e);
+mu[i] = beta[1] + u[Fish_ID_Index[i]] + w[Wild_or_Hatch_ID[i]] + beta[2] * Length[i];
+    Egg_diam[i] ~ normal(mu[i], sigma_e);
   }
 }
 
