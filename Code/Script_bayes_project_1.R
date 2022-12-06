@@ -212,14 +212,42 @@ stanDat_3 <- list(Fish_ID_Index = as.integer(coho_eggs_5$Fish_ID_Index), #change
                 K = nlevels(as.factor(coho_eggs_5$Wild_or_Hatch_ID)))
 stantest_3 <- stan(file="Stan_mod_eggs_figureout.stan", data = stanDat_3,
                    iter = 2000, chains = 4)
-#gives weird errors
-#saveRDS(stantest_3, "stantest_3.rds")
+
+
+
+stantest_3 <- readRDS("stantest_3.rds")
+class(stantest_3)
+
+summary(stantest_3)
 plot(stantest_3)
 stan_trace(stantest_3)
 stan_hist(stantest_3)
 
 
 
-#exp 11/29/22
-class(coho_eggs_4)
-nlevels(as.factor(coho_eggs_4$Wild_or_Hatch_ID))
+#12/06/22
+##centered model with more iterations
+stantest_4 <- stan(file="Stan_mod_eggs_figureout.stan", data = stanDat_3,
+                   iter = 5000, chains = 4)
+#saveRDS(stantest_4, "stantest_4.rds")
+plot(stantest_4)
+stan_trace(stantest_4)
+
+#uncentered model with more interations
+
+
+##what about making this one-sided?
+
+
+stanDat_4.5 <- list(Fish_ID_Index = as.integer(coho_eggs_5$Fish_ID_Index), #change to be egg spec
+                  Wild_or_Hatch_ID = as.integer(coho_eggs_5$Wild_or_Hatch_ID),
+                  Egg_diam = coho_eggs_5$c_egg_diam,
+                  Length = coho_eggs_5$c_length,
+                  N = nrow(coho_eggs_5),
+                  J = nlevels(as.factor(coho_eggs_5$Fish_ID_Index)),
+                  K = nlevels(as.factor(coho_eggs_5$Wild_or_Hatch_ID)))
+stantest_4.5 <- stan(file="Stan_mod_eggs_figureout_aaronhelp.stan", data = stanDat_4.5,
+                   iter = 2000, chains = 4)
+## add integers? 
+##n_fish_ID
+
