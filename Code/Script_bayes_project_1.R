@@ -248,6 +248,55 @@ stanDat_4.5 <- list(Fish_ID_Index = as.integer(coho_eggs_5$Fish_ID_Index), #chan
                   K = nlevels(as.factor(coho_eggs_5$Wild_or_Hatch_ID)))
 stantest_4.5 <- stan(file="Stan_mod_eggs_figureout_aaronhelp.stan", data = stanDat_4.5,
                    iter = 2000, chains = 4)
+
+plot(stantest_4.5)
+stan_trace(stantest_4.5, pars = c("Beta_0", "Beta_1", "sigma_e", "sigma_u"))
+stan_hist(stantest_4.5, pars = c("Beta_0", "Beta_1", "sigma_e", "sigma_u"))
+#saveRDS(stantest_4.5, "stantest_4.5.rds")
 ## add integers? 
 ##n_fish_ID
 
+#not-centered:
+stanDat_4.6 <- list(Fish_ID_Index = as.integer(coho_eggs_5$Fish_ID_Index), #change to be egg spec
+                    Wild_or_Hatch_ID = as.integer(coho_eggs_5$Wild_or_Hatch_ID),
+                    Egg_diam = coho_eggs_5$Diameter..mm.,
+                    Length = coho_eggs_5$Length..mm.,
+                    N = nrow(coho_eggs_5),
+                    J = nlevels(as.factor(coho_eggs_5$Fish_ID_Index)),
+                    K = nlevels(as.factor(coho_eggs_5$Wild_or_Hatch_ID)))
+stantest_4.6 <- stan(file="Stan_mod_eggs_figureout_aaronhelp.stan", data = stanDat_4.5,
+                     iter = 10000, chains = 4)
+
+traceplot(stantest_4.6, pars=c("Beta_0", "Beta_1", "sigma_e", "sigma_u"))
+
+
+
+##so many attempts.
+##Try just the one random effect, without the factor of wild/hatch or the covariate first
+##using the centered data
+pulpdat_Alex <- list(N=nrow(coho_eggs_5),
+                J=length(unique(coho_eggs_5$Fish_ID_Index)),
+                response=coho_eggs_5$c_egg_diam,
+                predictor=as.numeric(coho_eggs_5$Fish_ID_Index))
+#run the model
+Just_random_effect_model_c <- stan(file="Just_random_effect.stan",
+                                   data=pulpdat_Alex,
+                                   iter=5000,
+                                   chains=4)
+#suppressMessages(sm <- stan_model(stanc_ret = rt, verbose=FALSE))
+#system.time(fit <- sampling(sm, data=pulpdat))
+saveRDS(Just_random_effect_model_c, "random_effects_moded.RDS")
+stan_trace(Just_random_effect_model_c, pars = c("mu", "sigmaepsilon", "sigmaalpha"))
+summary(Just_random_effect_model_c)
+
+#pname <- "mu"
+#muc <- rstan::extract(fit, pars=pname,  permuted=FALSE, inc_warmup=FALSE)
+#mdf <- reshape2::melt(muc)
+#mdf %>% dplyr::filter(iterations %% 100 == 0) %>% 
+ # ggplot(aes(x=iterations,y=value,color=chains)) + geom_line() + ylab(mdf$parameters[1])
+
+Just_random_effect_model_c_2 <- stan(file="Just_random_effect_2.stan",
+                                   data=pulpdat_Alex,
+                                   iter=5000,
+                                   chains=4)
+stan_trace(Just_random_effect_model_c_2, pars = c("mu", "sigmaepsilon", "sigmaalpha"))

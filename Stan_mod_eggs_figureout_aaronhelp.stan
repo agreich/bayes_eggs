@@ -23,7 +23,6 @@ int<lower=1, upper=K> Wild_or_Hatch_ID[N]; // N could be replaced with 2? Make s
 //find paper with your written notes from office hours (probs at desk at work)
 }
 
-
 // The parameters accepted by the model. Our model
 // accepts two parameters 'mu' and 'sigma'.
 parameters {
@@ -57,5 +56,5 @@ for (i in 1:N){
 mu = Beta_0 + u[Fish_ID_Index[i]] + Wild_or_Hatch_ID[i] + Beta_1 * Length[i];
     Egg_diam[i] ~ normal(mu, sigma_e);
   }
+  
 }
-
