@@ -202,6 +202,8 @@ coho_eggs_5 <- coho_eggs_4 %>%
   mutate(c_length = Length..mm. - mean(Length..mm.))
 names(coho_eggs_5)
 
+write.csv(coho_eggs_5, "coho_eggs_5.csv")
+
 
 stanDat_3 <- list(Fish_ID_Index = as.integer(coho_eggs_5$Fish_ID_Index), #change to be egg spec
                 Wild_or_Hatch_ID = as.integer(coho_eggs_5$Wild_or_Hatch_ID),
@@ -210,7 +212,7 @@ stanDat_3 <- list(Fish_ID_Index = as.integer(coho_eggs_5$Fish_ID_Index), #change
                 N = nrow(coho_eggs_5),
                 J = nlevels(as.factor(coho_eggs_5$Fish_ID_Index)),
                 K = nlevels(as.factor(coho_eggs_5$Wild_or_Hatch_ID)))
-stantest_3 <- stan(file="Stan_mod_eggs_figureout.stan", data = stanDat_3,
+#stantest_3 <- stan(file="Stan_mod_eggs_figureout.stan", data = stanDat_3,
                    iter = 2000, chains = 4)
 
 
@@ -285,9 +287,11 @@ Just_random_effect_model_c <- stan(file="Just_random_effect.stan",
                                    chains=4)
 #suppressMessages(sm <- stan_model(stanc_ret = rt, verbose=FALSE))
 #system.time(fit <- sampling(sm, data=pulpdat))
-saveRDS(Just_random_effect_model_c, "random_effects_moded.RDS")
+#saveRDS(Just_random_effect_model_c, "random_effects_moded.RDS")
+Just_random_effect_model_c <- readRDS("random_effects_moded.RDS")
 stan_trace(Just_random_effect_model_c, pars = c("mu", "sigmaepsilon", "sigmaalpha"))
-summary(Just_random_effect_model_c)
+#might need to thin
+summary(Just_random_effect_model_c, pars = c("mu", "sigmaepsilon", "sigmaalpha"))
 
 #pname <- "mu"
 #muc <- rstan::extract(fit, pars=pname,  permuted=FALSE, inc_warmup=FALSE)
@@ -300,3 +304,54 @@ Just_random_effect_model_c_2 <- stan(file="Just_random_effect_2.stan",
                                    iter=5000,
                                    chains=4)
 stan_trace(Just_random_effect_model_c_2, pars = c("mu", "sigmaepsilon", "sigmaalpha"))
+#how to thin tho?
+?stan_trace
+
+summary(Just_random_effect_model_c_2, pars=c("mu", "sigmaalpha", "sigmaepsilon"))
+##that is centered, which is why it is werid. MAybe don't center
+##NOT CENTERED:
+pulpdat_Alex <- list(N=nrow(coho_eggs_5),
+                     J=length(unique(coho_eggs_5$Fish_ID_Index)),
+                     response=coho_eggs_5$Diameter..mm.,
+                     predictor=as.numeric(coho_eggs_5$Fish_ID_Index))
+#run the model
+Just_random_effect_model_3 <- stan(file="Just_random_effect.stan",
+                                   data=pulpdat_Alex,
+                                   iter=5000,
+                                   chains=4)
+#suppressMessages(sm <- stan_model(stanc_ret = rt, verbose=FALSE))
+#system.time(fit <- sampling(sm, data=pulpdat))
+#saveRDS(Just_random_effect_model_c, "random_effects_moded.RDS")
+stan_trace(Just_random_effect_model_3, pars = c("mu", "sigmaepsilon", "sigmaalpha"))
+stan_hist(Just_random_effect_model_3, pars = c("mu", "sigmaepsilon", "sigmaalpha"))
+#might need to thin
+summary(Just_random_effect_model_3, pars = c("mu", "sigmaepsilon", "sigmaalpha"))
+saveRDS(Just_random_effect_model_3, "Just_random_effect_model_3.RDS")
+##what are sigma alpha and epsilon interps?
+###J is the number of coho id, which is 55
+###response is the coho Egg diamters (the y-values)
+### the predictor is the coho ID, which has a really long length
+
+
+##diagnostics on Just_random_effect_model_3
+
+print(Just_random_effect_model_3, pars=c("mu","sigmaalpha","sigmaepsilon","a"))
+print(Just_random_effect_model_3, pars=c("mu","sigmaalpha","sigmaepsilon"))
+#write.csv()
+
+###now do a fixed effect stan model
+
+
+##now do a linear mixed effect model
+
+
+##BRMS experiment
+#fit.c.C1 <- lmer(Diameter..mm. ~ Wild.or.Hatch +(1|ID), data=coho.clean, REML = F)
+library(tidybayes)
+#install.packages()
+library(brms)
+
+Stan_fit_random_only <- tidybrms(Diameter..mm. ~ 1 + (1|ID), data=coho.clean)
+fit.c.C1_STAN <- brm(Diameter..mm. ~ Wild.or.Hatch +(1|ID), data=coho.clean, REML = F)
+
+
