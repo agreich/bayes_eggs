@@ -19,11 +19,13 @@ transformed parameters {
   bld = sigmaID * eta;
 
   for (i in 1:N)
-    yhat[i] = trt[origin[i]]+bld[FishID[i]];
+    yhat[i] = trt[origin[i]]+bld[FishID[i]];//fitted value
 
 }
 model {
-  eta ~ normal(0, 1);
-
-  y ~ normal(yhat, sigmaepsilon);
+  eta ~ normal(0, 1); //is this too small for variance? Probably. Try with larger var
+//trt can set prior here
+//trt~ normal(5, 100)
+//check if results are robust against different priors
+  y ~ normal(yhat, sigmaepsilon); 
 }

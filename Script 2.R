@@ -37,9 +37,24 @@ Mod_stan_script_2 <- stan(file="Stan_for_script2.stan",
 saveRDS(Mod_stan_script_2, "Mod_stan_script2.RDS")
 ##graph the STAN
 stan_trace(Mod_stan_script_2, pars = c("sigmaepsilon", "sigmaID"))
-stan_trace(Mod_stan_script_2, pars = c("trt", "bld"))
+stan_trace(Mod_stan_script_2, pars = c("trt"))
 stan_hist(Mod_stan_script_2, pars = c("sigmaepsilon", "sigmaID"))
-stan_hist(Mod_stan_script_2, pars = c("trt", "bld"))
+stan_hist(Mod_stan_script_2, pars = c("trt"))
 
 #STAN tables:
 print(Mod_stan_script_2, pars=c("trt","sigmaID","sigmaepsilon","bld"))
+
+
+#look like it works!! Yay! And the values make sense! Let's run this with 10,000 samples 
+##for the project purposes!
+
+#graphs needed:
+##thinned traceplot
+##density plot or histogram
+
+##Q's for margaret office hours:
+##0) I don't understand my model statement
+##1) calculate posterior dist as part of 
+##2) add more informative priors
+##3)a way to make this calculation one-sided?
+
