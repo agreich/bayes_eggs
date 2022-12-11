@@ -1,5 +1,6 @@
 ##script 2
 ###based off of this example: https://github.com/julianfaraway/rexamples/blob/main/mixed/penicillin.md
+###I should also reference this one: https://github.com/julianfaraway/rexamples/blob/main/mixed/abrasion.md
 ##trying the linear mixed effect stan model via randomized block design
 
 library(ggplot2)
