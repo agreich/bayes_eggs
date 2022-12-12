@@ -59,3 +59,46 @@ print(Mod_stan_script_2, pars=c("trt","sigmaID","sigmaepsilon","bld"))
 ##2) add more informative priors
 ##3)a way to make this calculation one-sided?
 
+#12/11/22. Right nowjust stick with script for stan_
+set.seed(15432)
+dat_stan_script_2 <- list(N=nrow(coho_eggs_5), 
+                          K=length(unique(coho_eggs_5$Wild_or_Hatch_ID)), 
+                          J=length(unique(coho_eggs_5$Fish_ID_Index)), 
+                          origin=coho_eggs_5$Wild_or_Hatch_ID, 
+                          FishID=coho_eggs_5$Fish_ID_Index, 
+                          y=coho_eggs_5$Diameter..mm.)
+Mod_stan_script_2 <- stan(file="Script_for_stan_2_simplifed.stan",
+                          data=dat_stan_script_2,
+                          iter=5000,
+                          chains=4)
+print(Mod_stan_script_2, pars=c("wildhatch","sigmaID","sigmaepsilon","bld"))
+
+
+#12/12/22 attemp corresponding to "Stan_4_basedon_brms.stan"
+set.seed(15432)
+dat_stan_script_4 <- list(N=nrow(coho_eggs_5), 
+                          K=length(unique(coho_eggs_5$Wild_or_Hatch_ID)), 
+                          J=length(unique(coho_eggs_5$Fish_ID_Index)), 
+                          origin=coho_eggs_5$Wild_or_Hatch_ID, 
+                          FishID=coho_eggs_5$Fish_ID_Index, 
+                          y=coho_eggs_5$Diameter..mm.)
+Mod_stan_script_4 <- stan(file="Stan_4_basedon_brms.stan",
+                          data=dat_stan_script_4,
+                          iter=5000,
+                          chains=4)
+print(Mod_stan_script_4, pars=c("wh","sigmaID","sigmaepsilon","bld"))
+stan_trace(Mod_stan_script_4, pars = c("sigmaepsilon", "sigmaID"))
+#Fuck yeah it works
+#let's run with 10,000 samples!
+dat_stan_script_4 <- list(N=nrow(coho_eggs_5), 
+                          K=length(unique(coho_eggs_5$Wild_or_Hatch_ID)), 
+                          J=length(unique(coho_eggs_5$Fish_ID_Index)), 
+                          origin=coho_eggs_5$Wild_or_Hatch_ID, 
+                          FishID=coho_eggs_5$Fish_ID_Index, 
+                          y=coho_eggs_5$Diameter..mm.)
+Mod_stan_script_4_10000 <- stan(file="Stan_4_basedon_brms.stan",
+                          data=dat_stan_script_4,
+                          iter=10000,
+                          chains=4)
+print(Mod_stan_script_4_10000, pars=c("wh","sigmaID","sigmaepsilon","bld"))
+stan_trace(Mod_stan_script_4_10000, pars = c("sigmaepsilon", "sigmaID"))
