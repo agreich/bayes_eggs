@@ -90,15 +90,56 @@ print(Mod_stan_script_4, pars=c("wh","sigmaID","sigmaepsilon","bld"))
 stan_trace(Mod_stan_script_4, pars = c("sigmaepsilon", "sigmaID"))
 #Fuck yeah it works
 #let's run with 10,000 samples!
-dat_stan_script_4 <- list(N=nrow(coho_eggs_5), 
-                          K=length(unique(coho_eggs_5$Wild_or_Hatch_ID)), 
-                          J=length(unique(coho_eggs_5$Fish_ID_Index)), 
-                          origin=coho_eggs_5$Wild_or_Hatch_ID, 
-                          FishID=coho_eggs_5$Fish_ID_Index, 
-                          y=coho_eggs_5$Diameter..mm.)
-Mod_stan_script_4_10000 <- stan(file="Stan_4_basedon_brms.stan",
+
+Mod_stan_script_4_10000_fullmod <- stan(file="Stan_4_basedon_brms.stan",
                           data=dat_stan_script_4,
                           iter=10000,
                           chains=4)
-print(Mod_stan_script_4_10000, pars=c("wh","sigmaID","sigmaepsilon","bld"))
-stan_trace(Mod_stan_script_4_10000, pars = c("sigmaepsilon", "sigmaID"))
+print(Mod_stan_script_4_10000_fullmod, pars=c("wh","sigmaID","sigmaepsilon","bld"))
+stan_trace(Mod_stan_script_4_10000_fullmod, pars = c("sigmaepsilon", "sigmaID"))#can I thin?
+saveRDS(Mod_stan_script_4_10000_fullmod, "stan_full_egg_model.RDS")
+
+summary(coho_eggs_5$Diameter..mm.)
+
+#save that full mod
+
+#now let's do the mod without the wild/hatch covariate. This will requrie building a new model (without wh)
+dat_stan_script_4_nowh <- list(N=nrow(coho_eggs_5), 
+                          K=length(unique(coho_eggs_5$Wild_or_Hatch_ID)), 
+                          J=length(unique(coho_eggs_5$Fish_ID_Index)), 
+                          #origin=coho_eggs_5$Wild_or_Hatch_ID, 
+                          FishID=coho_eggs_5$Fish_ID_Index, 
+                          y=coho_eggs_5$Diameter..mm.)
+Mod_stan_script_4_10000_nowh <- stan(file="Stan_4_basedon_bmrs_nowh.stan",
+                                        data=dat_stan_script_4_nowh,
+                                        iter=10000,
+                                        chains=4)
+print(Mod_stan_script_4_10000_nowh, pars=c("wh","sigmaID","sigmaepsilon","bld"))
+
+#compare using dic.samples or something
+##waic would work
+
+########################################
+#let's do this with 10 as a prior
+Mod_stan_script_4_10000_fullmod_10prior <- stan(file="Stan_4_basedon_brms_10.stan",
+                                        data=dat_stan_script_4,
+                                        iter=10000,
+                                        chains=4)
+print(Mod_stan_script_4_10000_fullmod_10prior, pars=c("wh","sigmaID","sigmaepsilon","bld"))
+stan_trace(Mod_stan_script_4_10000_fullmod_10prior, pars = c("sigmaepsilon", "sigmaID"))#can I thin?
+saveRDS(Mod_stan_script_4_10000_fullmod_10prior, "stan_full_egg_model_10.RDS")
+
+summary(coho_eggs_5$Diameter..mm.)
+###########################################
+#let's do this with 100 as a prior
+Mod_stan_script_4_10000_fullmod_100prior <- stan(file="Stan_4_basedon_brms_100.stan",
+                                        data=dat_stan_script_4,
+                                        iter=10000,
+                                        chains=4)
+print(Mod_stan_script_4_10000_fullmod_100prior, pars=c("wh","sigmaID","sigmaepsilon","bld"))
+stan_trace(Mod_stan_script_4_10000_fullmod_100prior, pars = c("sigmaepsilon", "sigmaID"))#can I thin?
+saveRDS(Mod_stan_script_4_10000_fullmod_100prior, "stan_full_egg_model_100.RDS")
+##in this mod, stan gets sigma ID stuck at 0, is this right though?
+
+plot(coho_eggs_5$Diameter..mm.)
+
