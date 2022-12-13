@@ -143,3 +143,73 @@ saveRDS(Mod_stan_script_4_10000_fullmod_100prior, "stan_full_egg_model_100.RDS")
 
 plot(coho_eggs_5$Diameter..mm.)
 
+#########################
+##let's change the prior to 6
+##more realistic
+Mod_stan_script_5_10000_fullmod <- stan(file="Stan_4_basedon_brms_2.stan",
+                                        data=dat_stan_script_4,
+                                        iter=10000,
+                                        chains=4)
+print(Mod_stan_script_5_10000_fullmod, pars=c("wh","sigmaID","sigmaepsilon","bld"))
+stan_trace(Mod_stan_script_5_10000_fullmod, pars = c("sigmaepsilon", "sigmaID"))#can I thin?
+#saveRDS(Mod_stan_script_4_10000_fullmod, "stan_full_egg_model.RDS")
+summary(Mod_stan_script_5_10000_fullmod)
+
+summary(coho_eggs_5$Diameter..mm.)
+
+###################
+######
+#KEEPER MODELS
+Mod_stan_script_fixedwh_fullmod <- stan(file="Stan_4_basedon_brms.stan",
+                                        data=dat_stan_script_4,
+                                        iter=10000,
+                                        chains=4)
+print(Mod_stan_script_fixedwh_fullmod , pars=c("wh","sigmaID","sigmaepsilon","bld"))
+
+
+dat_stan_script_4_nowh <- list(N=nrow(coho_eggs_5), 
+                               K=length(unique(coho_eggs_5$Wild_or_Hatch_ID)), 
+                               J=length(unique(coho_eggs_5$Fish_ID_Index)), 
+                               #origin=coho_eggs_5$Wild_or_Hatch_ID, 
+                               FishID=coho_eggs_5$Fish_ID_Index, 
+                               y=coho_eggs_5$Diameter..mm.)
+Mod_lesser <- stan(file="Stan_lesser.stan",
+                   data=dat_stan_script_4_nowh,
+                   iter=10000,
+                   chains=4)
+
+print(Mod_lesser , pars=c("wh","sigmaID","sigmaepsilon","bld"))
+
+##let's compare models, with the sd=1 model
+library(loo)
+?loo:waic
+#ok, probs just compare the sd one version, what i have so far because it's quitting time, as they say
+
+
+
+
+
+################3
+#trash test
+Mod_stan_script_5_5000_fullmod_100 <- stan(file="Stan_4_basedon_brms_2.stan",
+                                        data=dat_stan_script_4,
+                                        iter=5000,
+                                        chains=4)
+print(Mod_stan_script_5_5000_fullmod_100, pars=c("wh","sigmaID","sigmaepsilon","bld"))
+#stan_trace(Mod_stan_script_5_10000_fullmod, pars = c("sigmaepsilon", "sigmaID"))#can I thin?
+#saveRDS(Mod_stan_script_4_10000_fullmod, "stan_full_egg_model.RDS")
+#summary(Mod_stan_script_5_10000_fullmod)
+
+summary(coho_eggs_5$Diameter..mm.)
+
+####trash trash
+Mod_stan_script_fixedwh_fullmod <- stan(file="Stan_4_basedon_brms.stan",
+                                           data=dat_stan_script_4,
+                                           iter=5000,
+                                           chains=4)
+print(Mod_stan_script_fixedwh_fullmod , pars=c("wh","sigmaID","sigmaepsilon","bld"))
+#stan_trace(Mod_stan_script_5_10000_fullmod, pars = c("sigmaepsilon", "sigmaID"))#can I thin?
+#saveRDS(Mod_stan_script_4_10000_fullmod, "stan_full_egg_model.RDS")
+#summary(Mod_stan_script_5_10000_fullmod)
+
+summary(coho_eggs_5$Diameter..mm.)
