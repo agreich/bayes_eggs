@@ -180,6 +180,7 @@ Mod_lesser <- stan(file="Stan_lesser.stan",
                    chains=4)
 
 print(Mod_lesser , pars=c("sigmaID","sigmaepsilon","bld"))
+saveRDS(Mod_lesser,"Mod_lesser.RDS")
 
 ##let's compare models, with the sd=1 model
 library(loo)
@@ -205,7 +206,8 @@ saveRDS(Mod_stan_script_fixedwh_fullmod_loglik, "Stanmodfinal_1_loglik.RDS")
 ?loo
 loo1<- loo(Mod_stan_script_fixedwh_fullmod_loglik)
 loo2 <- loo(Mod_lesser)
-loo_compare(loo1,loo2)
+loo_compare(loo1,loo2) #model 2 is worse
+#save this table output!!
 
 # use the moment matching for loo with a stanfit object
 #loo_mm <- loo(fit1, pars = "log_lik", moment_match = TRUE)
