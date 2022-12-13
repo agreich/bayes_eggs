@@ -160,12 +160,12 @@ summary(coho_eggs_5$Diameter..mm.)
 ###################
 ######
 #KEEPER MODELS
-Mod_stan_script_fixedwh_fullmod <- stan(file="Stan_4_basedon_brms.stan",
-                                        data=dat_stan_script_4,
-                                        iter=10000,
-                                        chains=4)
-print(Mod_stan_script_fixedwh_fullmod , pars=c("wh","sigmaID","sigmaepsilon","bld"))
-saveRDS(Mod_stan_script_fixedwh_fullmod, "Stanmodfinal_1.RDS")
+#Mod_stan_script_fixedwh_fullmod <- stan(file="Stan_4_basedon_brms.stan",
+ #                                       data=dat_stan_script_4,
+  #                                      iter=10000,
+   #                                     chains=4)
+#print(Mod_stan_script_fixedwh_fullmod , pars=c("wh","sigmaID","sigmaepsilon","bld"))
+#saveRDS(Mod_stan_script_fixedwh_fullmod, "Stanmodfinal_1.RDS")
 
 
 dat_stan_script_4_nowh <- list(N=nrow(coho_eggs_5), 
@@ -185,19 +185,6 @@ print(Mod_lesser , pars=c("sigmaID","sigmaepsilon","bld"))
 library(loo)
 ?loo::waic
 
-get_waic <- function(stanfit){
-  # compute WAIC from the returned object from Stan
-  # the log likelihood must be named as 'log_lik'
-  waic <- function(log_lik) {
-    Tn <- - mean(log(colMeans(exp(log_lik))))
-    fV <- mean(colMeans(log_lik^2) - colMeans(log_lik)^2)
-    waic <- Tn + fV
-    waic
-  }
-  
-  stanfit %>% rstan::extract() %>% .$log_lik %>% waic()
-}
-
 #waic_1 <- get_waic(Mod_stan_script_fixedwh_fullmod)
 #get_waic(Mod_stan_script_fixedwh_fullmod)
 names(summary(Mod_stan_script_fixedwh_fullmod))
@@ -213,7 +200,21 @@ Mod_stan_script_fixedwh_fullmod_loglik <- stan(file="Stan_4_basedon_brms.stan",
 print(Mod_stan_script_fixedwh_fullmod_loglik , pars=c("wh","sigmaID","sigmaepsilon","bld"))
 saveRDS(Mod_stan_script_fixedwh_fullmod_loglik, "Stanmodfinal_1_loglik.RDS")
 
+#LOO TIME
+?compare_models
+?loo
+loo1<- loo(Mod_stan_script_fixedwh_fullmod_loglik)
+loo2 <- loo(Mod_lesser)
+loo_compare(loo1,loo2)
 
+# use the moment matching for loo with a stanfit object
+#loo_mm <- loo(fit1, pars = "log_lik", moment_match = TRUE)
+#print(loo_mm)
+
+#log_lik_1=extract_log_lik(loo1_sample, merge_chains = F)
+#log_lik_2=extract_log_lik(loo2_sample, merge_chains = F)
+#r_eff_1=relative_eff(log_lik_1)
+#r_eff_2=relative_eff(log_lik_2)
 
 ################3
 #trash test
