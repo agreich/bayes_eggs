@@ -180,7 +180,8 @@ Mod_lesser <- stan(file="Stan_lesser.stan",
                    chains=4)
 
 print(Mod_lesser , pars=c("sigmaID","sigmaepsilon","bld"))
-saveRDS(Mod_lesser,"Mod_lesser.RDS")
+#stan_trace(Mod_lesser, pars=c
+#saveRDS(Mod_lesser,"Mod_lesser.RDS")
 
 ##let's compare models, with the sd=1 model
 library(loo)
@@ -200,6 +201,13 @@ Mod_stan_script_fixedwh_fullmod_loglik <- stan(file="Stan_4_basedon_brms.stan",
                                         chains=4)
 print(Mod_stan_script_fixedwh_fullmod_loglik , pars=c("wh","sigmaID","sigmaepsilon","bld"))
 saveRDS(Mod_stan_script_fixedwh_fullmod_loglik, "Stanmodfinal_1_loglik.RDS")
+model1_trace<-stan_trace(Mod_stan_script_fixedwh_fullmod_loglik , pars=c("wh","sigmaID","sigmaepsilon"))
+
+model1_trace + xlab("Iteration") + ylab("Value")
+#bayesplot sounds cool, but the download isn't working for me right now. I have an issue downloading packages taht I'm not dealing with right now
+stan_hist(Mod_stan_script_fixedwh_fullmod_loglik, pars=c("wh","sigmaID","sigmaepsilon"))
+stan_diag(Mod_stan_script_fixedwh_fullmod_loglik)
+#stan_par(Mod_stan_script_fixedwh_fullmod_loglik, par=c("wh"))
 
 #LOO TIME
 ?compare_models

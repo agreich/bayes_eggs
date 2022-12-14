@@ -46,5 +46,5 @@ model {
 
 generated quantities {
   vector[N] log_lik;
-  for (n in 1:N) log_lik[n] = normal_lpdf(y[n]| mu, sigmaepsilon);
+  for (n in 1:N) log_lik[n] = normal_lpdf(y[n]| mu, sigmaepsilon);//this generates the log-likelihood for loo
 }
